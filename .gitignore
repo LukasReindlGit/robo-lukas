@@ -1,0 +1,81 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+config.local.json
+*.local.yaml
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.hypothesis/
+
+# Packaging / build (setuptools)
+build/
+dist/
+*.egg
+*.egg-info/
+.eggs/
+*.whl
+pip-wheel-metadata/
+wheels/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+
+# Tox / nox
+.tox/
+.nox/
+
+# Node (if used later)
+node_modules/
+
+# Local Chrome profile used for robo-outlook (SSO session data)
+.chrome-robo-profile/
+
+# Local browser/tooling bundles (e.g. Chrome zips for WSL/Windows setups)
+.tools/
+
+# Browser automation artifacts
+.robo-todo-investigate/
+.robo-todo-investigate-test/
+.robo-todo-debug/
+screenshots/
+downloads/
+trace/
+playwright-report/
+test-results/
+*.har
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors (keep .vscode/ if team shares settings)
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
