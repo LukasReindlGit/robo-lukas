@@ -101,6 +101,9 @@ and all comments for each item.
 ```powershell
 # Parent + subtasks + comments → ./hagetest
 robo-jira export-tree PHHPC-103 --jira-url https://hagebau.atlassian.net --out-dir hagetest --format json
+
+# Also download attachment files into ./hagetest/attachments/<ISSUE-KEY>/
+robo-jira export-tree PHHPC-103 --jira-url https://hagebau.atlassian.net --out-dir hagetest --download-files --format json
 ```
 
 Output files:
@@ -108,6 +111,7 @@ Output files:
 - `hagetest/PHHPC-103.json` (root issue)
 - `hagetest/<SUBTASK-KEY>.json` (one file per subtask)
 - `hagetest/manifest.json` (contains exported keys/files + metadata)
+- `hagetest/attachments/<ISSUE-KEY>/...` (when `--download-files` is used)
 
 Use `--no-comments` if you only want issue fields and descriptions.
 
@@ -145,6 +149,17 @@ All commands support `--format json` (default: `text`).  The JSON shape for an i
       "created": "2025-05-01T…",
       "updated": "2025-05-01T…",
       "body_text": "Updated the acceptance criteria…"
+    }
+  ],
+  "attachments": [
+    {
+      "attachment_id": "10001",
+      "filename": "spec.pdf",
+      "mime_type": "application/pdf",
+      "size_bytes": 48291,
+      "created": "2025-05-01T…",
+      "author": "Jane Doe",
+      "content_url": "https://your-org.atlassian.net/secure/attachment/..."
     }
   ]
 }

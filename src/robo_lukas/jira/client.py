@@ -11,10 +11,11 @@ Session cookies (extracted from the browser after login) are forwarded via a
 from __future__ import annotations
 
 from typing import Any
+from pathlib import Path
 
 import requests
 
-from robo_lukas.jira.models import JiraComment, JiraIssue, JiraUser
+from robo_lukas.jira.models import JiraAttachment, JiraComment, JiraIssue, JiraUser
 
 
 # Default fields fetched for search / list operations (omitting heavy fields like comments).
@@ -31,8 +32,8 @@ _LIST_FIELDS: list[str] = [
     "customfield_10020",  # Sprint (Jira Cloud)
 ]
 
-# Full fields including description and comments, for single-issue fetch.
-_DETAIL_FIELDS: list[str] = _LIST_FIELDS + ["description", "comment"]
+# Full fields including description/comments/attachments, for single-issue fetch.
+_DETAIL_FIELDS: list[str] = _LIST_FIELDS + ["description", "comment", "attachment"]
 
 
 class JiraClient:
@@ -66,6 +67,13 @@ class JiraClient:
         r = self.session.get(url, params=params, timeout=30)
         r.raise_for_status()
         return r.json()
+
+    def _download(self, url: str, target_path: Path) -> None:
+        """Download binary content from Jira and write it to *target_path*."""
+        resp = self.session.get(url, timeout=60)
+        resp.raise_for_status()
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_bytes(resp.content)
 
     # ------------------------------------------------------------------
     # Public API
@@ -162,6 +170,10 @@ class JiraClient:
             extra_jql=extra_jql,
         )
 
+    def download_attachment(self, attachment: JiraAttachment, target_path: Path) -> None:
+        """Download a Jira attachment to a local path."""
+        self._download(attachment.content_url, target_path)
+
     # ------------------------------------------------------------------
     # Parsing
     # ------------------------------------------------------------------
@@ -186,6 +198,20 @@ class JiraClient:
                 )
             )
 
+        attachments: list[JiraAttachment] = []
+        for a in fields.get("attachment") or []:
+            attachments.append(
+                JiraAttachment(
+                    attachment_id=str(a.get("id", "")),
+                    filename=str(a.get("filename", "")),
+                    mime_type=a.get("mimeType"),
+                    size_bytes=a.get("size"),
+                    created=str(a.get("created", "")),
+                    author=((a.get("author") or {}).get("displayName")),
+                    content_url=str(a.get("content", "")),
+                )
+            )
+
         sprint_name = _extract_sprint_name(fields.get("customfield_10020"))
 
         return JiraIssue(
@@ -201,6 +227,7 @@ class JiraClient:
             priority=((fields.get("priority") or {}).get("name")) if fields.get("priority") else None,
             description_text=desc_text or None,
             comments=comments,
+            attachments=attachments,
             labels=list(fields.get("labels") or []),
             sprint=sprint_name,
         )

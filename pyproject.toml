@@ -23,6 +23,7 @@ dev = [
 robo-outlook = "robo_lukas.outlook.cli:main"
 robo-todo = "robo_lukas.ms_todo.cli:main"
 robo-jira = "robo_lukas.jira.cli:main"
+robo-git = "robo_lukas.git_local.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

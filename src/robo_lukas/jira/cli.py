@@ -24,6 +24,7 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime, timezone
+import re
 
 from dotenv import load_dotenv
 
@@ -137,6 +138,12 @@ def _print_json(obj) -> None:
     except UnicodeEncodeError:
         sys.stdout.buffer.write(text.encode("utf-8", errors="replace"))
         sys.stdout.buffer.write(b"\n")
+
+
+def _safe_filename(name: str) -> str:
+    """Return a filesystem-safe filename while keeping it readable."""
+    cleaned = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name).strip()
+    return cleaned or "attachment.bin"
 
 
 def _make_client(args: argparse.Namespace, cfg: JiraConfig, driver) -> JiraClient:
@@ -357,8 +364,10 @@ def cmd_export_tree(args: argparse.Namespace) -> int:
 
         out_dir = Path(args.out_dir).expanduser()
         out_dir.mkdir(parents=True, exist_ok=True)
+        attachments_root = out_dir / "attachments"
 
         exported_paths: list[str] = []
+        downloaded_attachments: list[str] = []
         all_keys = [root_issue.key, *[s.key for s in subtasks]]
         for key in all_keys:
             issue = root_issue if key == root_issue.key else client.get_issue(
@@ -372,13 +381,32 @@ def cmd_export_tree(args: argparse.Namespace) -> int:
             )
             exported_paths.append(str(target.as_posix()))
 
+            if args.download_files:
+                issue_attachment_dir = attachments_root / key
+                seen_names: set[str] = set()
+                for att in issue.attachments:
+                    file_name = _safe_filename(att.filename)
+                    unique_name = file_name
+                    stem, suffix = os.path.splitext(file_name)
+                    counter = 2
+                    while unique_name.lower() in seen_names:
+                        unique_name = f"{stem}_{counter}{suffix}"
+                        counter += 1
+                    seen_names.add(unique_name.lower())
+
+                    att_target = issue_attachment_dir / unique_name
+                    client.download_attachment(att, att_target)
+                    downloaded_attachments.append(str(att_target.as_posix()))
+
         manifest = {
             "jira_url": cfg.base_url,
             "root_issue": root_issue.key,
             "subtask_keys": [s.key for s in subtasks],
             "include_comments": include_comments,
+            "download_files": bool(args.download_files),
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "exported_files": exported_paths,
+            "downloaded_attachments": downloaded_attachments,
         }
         manifest_path = out_dir / "manifest.json"
         manifest_path.write_text(
@@ -396,12 +424,16 @@ def cmd_export_tree(args: argparse.Namespace) -> int:
                     "out_dir": str(out_dir.as_posix()),
                     "manifest": str(manifest_path.as_posix()),
                     "files_written": len(exported_paths) + 1,
+                    "attachments_downloaded": len(downloaded_attachments),
                 }
             )
         else:
             print(f"Exported root issue: {root_issue.key}")
             print(f"Exported subtasks:   {len(subtasks)}")
             print(f"Output directory:    {out_dir}")
+            if args.download_files:
+                print(f"Downloaded files:    {len(downloaded_attachments)}")
+                print(f"Attachments dir:     {attachments_root}")
             print(f"Manifest:            {manifest_path}")
         return 0
     finally:
@@ -581,6 +613,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--no-comments",
         action="store_true",
         help="Skip loading comments for root issue and subtasks.",
+    )
+    ex.add_argument(
+        "--download-files",
+        action="store_true",
+        help="Download Jira attachments into out-dir/attachments/<ISSUE-KEY>/.",
     )
     ex.add_argument("--format", choices=("text", "json"), default="text")
     ex.set_defaults(func=cmd_export_tree)
