@@ -1,0 +1,16 @@
+{
+  "key": "PHHPC-1314",
+  "summary": "Funktion zum Entfernen von Lieferanten aus einer Aktion",
+  "status": "Offen",
+  "issue_type": "Unteraufgabe",
+  "created": "2026-05-22T15:18:21.477+0200",
+  "updated": "2026-05-22T15:18:23.548+0200",
+  "url": "https://hagebau.atlassian.net/browse/PHHPC-1314",
+  "assignee": null,
+  "reporter": "Thomas Rehbein",
+  "priority": "Undefined",
+  "description_text": "Implementiere eine Funktion, mit der der CM Lieferanten aus einer Aktion entfernen kann. Stelle sicher, dass alle damit verbundenen Bestellartikel und Artikelverhandlungen entsprechend behandelt werden.\n",
+  "comments": [],
+  "labels": [],
+  "sprint": "SMART Release 2 - Sprint 1"
+}

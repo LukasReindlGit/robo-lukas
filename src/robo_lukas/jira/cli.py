@@ -23,6 +23,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 
@@ -340,6 +341,74 @@ def cmd_search(args: argparse.Namespace) -> int:
             quit_chrome_driver_best_effort(driver)
 
 
+def cmd_export_tree(args: argparse.Namespace) -> int:
+    """Export one Jira issue and its direct subtasks to JSON files."""
+    load_dotenv()
+    cfg = _load_config(args)
+    driver = _driver_from_args(args, cfg)
+    try:
+        client = _make_client(args, cfg, driver)
+        include_comments = not args.no_comments
+        root_issue = client.get_issue(args.issue_key, include_comments=include_comments)
+        subtasks = client.search(
+            f"parent = {args.issue_key} ORDER BY created ASC",
+            max_results=args.limit,
+        )
+
+        out_dir = Path(args.out_dir).expanduser()
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        exported_paths: list[str] = []
+        all_keys = [root_issue.key, *[s.key for s in subtasks]]
+        for key in all_keys:
+            issue = root_issue if key == root_issue.key else client.get_issue(
+                key,
+                include_comments=include_comments,
+            )
+            target = out_dir / f"{key}.json"
+            target.write_text(
+                json.dumps(issue.to_json_dict(), indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            exported_paths.append(str(target.as_posix()))
+
+        manifest = {
+            "jira_url": cfg.base_url,
+            "root_issue": root_issue.key,
+            "subtask_keys": [s.key for s in subtasks],
+            "include_comments": include_comments,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "exported_files": exported_paths,
+        }
+        manifest_path = out_dir / "manifest.json"
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+        if args.format == "json":
+            _print_json(
+                {
+                    "status": "ok",
+                    "jira_url": cfg.base_url,
+                    "root_issue": root_issue.key,
+                    "subtasks": len(subtasks),
+                    "out_dir": str(out_dir.as_posix()),
+                    "manifest": str(manifest_path.as_posix()),
+                    "files_written": len(exported_paths) + 1,
+                }
+            )
+        else:
+            print(f"Exported root issue: {root_issue.key}")
+            print(f"Exported subtasks:   {len(subtasks)}")
+            print(f"Output directory:    {out_dir}")
+            print(f"Manifest:            {manifest_path}")
+        return 0
+    finally:
+        if not args.keep_browser:
+            quit_chrome_driver_best_effort(driver)
+
+
 # ---------------------------------------------------------------------------
 # Shared argument attachment
 # ---------------------------------------------------------------------------
@@ -487,6 +556,34 @@ def _build_parser() -> argparse.ArgumentParser:
     se.add_argument("--limit", type=int, default=25, metavar="N", help="Max results (default 25).")
     se.add_argument("--format", choices=("text", "json"), default="text")
     se.set_defaults(func=cmd_search)
+
+    # ── export-tree ───────────────────────────────────────────────────────────
+    ex = sub.add_parser(
+        "export-tree",
+        help="Export one issue and all direct subtasks to JSON files.",
+    )
+    _attach_shared_jira_args(ex)
+    ex.add_argument("issue_key", help="Root issue key (e.g. PROJ-123).")
+    ex.add_argument(
+        "--out-dir",
+        default="jira-export",
+        metavar="DIR",
+        help="Target directory for exported JSON files (default: jira-export).",
+    )
+    ex.add_argument(
+        "--limit",
+        type=int,
+        default=500,
+        metavar="N",
+        help="Maximum number of subtasks to fetch (default 500).",
+    )
+    ex.add_argument(
+        "--no-comments",
+        action="store_true",
+        help="Skip loading comments for root issue and subtasks.",
+    )
+    ex.add_argument("--format", choices=("text", "json"), default="text")
+    ex.set_defaults(func=cmd_export_tree)
 
     return p
 

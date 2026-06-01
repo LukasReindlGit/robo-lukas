@@ -1,0 +1,16 @@
+{
+  "key": "PHHPC-1311",
+  "summary": "Funktion zur Auswahl von Lieferanten aus dem zentralen Lieferantenstamm für eine Aktion",
+  "status": "Offen",
+  "issue_type": "Unteraufgabe",
+  "created": "2026-05-22T15:18:13.692+0200",
+  "updated": "2026-05-22T15:18:16.038+0200",
+  "url": "https://hagebau.atlassian.net/browse/PHHPC-1311",
+  "assignee": null,
+  "reporter": "Thomas Rehbein",
+  "priority": "Undefined",
+  "description_text": "Implementiere eine Funktion, mit der der Category Manager (CM) Lieferanten aus dem zentralen Lieferantenstamm für eine Aktion auswählen kann. Die Auswahl soll benutzerfreundlich und performant sein.\n",
+  "comments": [],
+  "labels": [],
+  "sprint": "SMART Release 2 - Sprint 1"
+}

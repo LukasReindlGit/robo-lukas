@@ -98,7 +98,14 @@ class JiraClient:
             "startAt": start_at,
             "fields": ",".join(fields if fields is not None else _LIST_FIELDS),
         }
-        data = self._get("/rest/api/3/search", params=params)
+        try:
+            data = self._get("/rest/api/3/search", params=params)
+        except requests.HTTPError as exc:
+            status_code = exc.response.status_code if exc.response is not None else None
+            if status_code != 410:
+                raise
+            # Some Jira Cloud tenants no longer support GET /search.
+            data = self._get("/rest/api/3/search/jql", params=params)
         return [self._parse_issue(item) for item in (data.get("issues") or [])]
 
     def get_issue(self, issue_key: str, *, include_comments: bool = True) -> JiraIssue:

@@ -1,0 +1,46 @@
+{
+  "key": "PHHPC-1294",
+  "summary": "Lieferantenstammdaten Push nach Salesforce",
+  "status": "In Arbeit",
+  "issue_type": "Substory",
+  "created": "2026-05-21T11:48:58.582+0200",
+  "updated": "2026-05-28T15:42:53.968+0200",
+  "url": "https://hagebau.atlassian.net/browse/PHHPC-1294",
+  "assignee": "Franziska Schmidt",
+  "reporter": "Thomas Rehbein",
+  "priority": "Undefined",
+  "description_text": "Für das SMART Projekt müssen künftig alle relevanten Lieferantenstammdaten von hagebau nach Salesforce gepusht werden.\nIm ersten Schritt betrifft dies die Einzelhändler. Die Fachhändler sind zunächst nicht Bestandteil dieser Umsetzung. Wichtig ist, dass alle Lieferanten inkl. Lieferbedingungen der Einzelhändler übertragen werden und nicht nur die Lieferanten, die mit Artikelimporten verbunden sind, wie es im WARP Projekt der Fall ist.\nFür das WARP Projekt besteht bereits eine vergleichbare Implementierung. Aus dieser bestehenden Lösung sollen nach Möglichkeit das fachliche Mapping sowie die verwendete Transfertechnologie übernommen bzw. als Grundlage für die SMART Umsetzung verwendet werden:\n\nWARP Ticket: https://hagebau.atlassian.net/browse/DIKONV-2456?search_id=5cbd553f-44f3-4959-a764-0a81200a6267&referrer=quick-find \nWARP Dokumentation: https://hagebau.atlassian.net/wiki/x/sAyXCQ \n• Zusätzlich zur initialen Übertragung der Lieferantenstammdaten sollen laufende Stammdatenänderungen künftig regelmäßig nach Salesforce aktualisiert werden.\n• Zusätzlich müssen alle Lieferbedingungen pro Lieferant mit aktualisiert werden.\nZiel der Umsetzung\nSalesforce soll für das SMART Projekt regelmäßig mit den vollständigen und aktuellen Lieferantenstammdaten der Einzelhändler versorgt werden.\nAbgrenzung\n• Gilt im ersten Schritt nur für Einzelhändler.\n• Fachhändler sind zunächst nicht enthalten.\n• Es sollen alle Lieferanten berücksichtigt werden, nicht nur Lieferanten mit Artikelimport-Bezug.\n• Bestehende WARP Implementierung soll als technische und fachliche Grundlage geprüft werden.\nOffene Punkte\n1. Abstimmung mit Annika zum fachlichen Mapping.\n2. Abstimmung mit den IT-Kollegen zur bestehenden WARP Implementierung.\n3. Prüfung, welche Transfertechnologie aus WARP übernommen werden kann.\n4. Definition, in welchem Intervall laufende Stammdatenänderungen nach Salesforce aktualisiert werden sollen.\n5. Klärung, ob für SMART zusätzliche Felder oder abweichende Mapping-Regeln benötigt werden.\n6. Benötigt SMART auch die Lieferbedingungen und wenn, welche?\n7. Prüfung ob die Implementierung für SMART die Implementierung von WARP ersetzt bzw. die Implementierung von WARP für SMART erweitert werden muss.\n",
+  "comments": [
+    {
+      "author": "Thomas Rehbein",
+      "created": "2026-05-21T11:53:00.346+0200",
+      "updated": "2026-05-21T11:53:00.346+0200",
+      "body_text": "Hallo @Austen Bünnemann @Dennis Leyens \nbitte seid so gut und nehmt Euch diesem Thema an.\nVG,\nThomas\ncc @Nell Kieschnick @Franziska Schmidt \n"
+    },
+    {
+      "author": "Austen Bünnemann",
+      "created": "2026-05-21T16:56:09.128+0200",
+      "updated": "2026-05-21T17:08:31.872+0200",
+      "body_text": "Hallo @Dennis Leyens ,\npasst das aus Deiner Sicht so? Was machen wir mit den Lieferbedingungen? Sollen diese auch von allen Einzelhändlern nach Salesforce gepusht werden? Waren die nicht “rein” artikelabhängig? Laut der Attributen Liste von Nell wird zumindest das Feld Werbe_Freihausgrenze__c von den Lieferbedingungen für die Aktionen benötigt.\n\nDann bitte an @Thomas Rehbein weiterleiten. @Thomas Rehbein könnte das dann Franziska Schmidt zuweisen, soweit okay und das in den Sprint einordnen.\nDanke!\n\nGruß\nAusten\n"
+    },
+    {
+      "author": "Austen Bünnemann",
+      "created": "2026-05-22T18:28:21.262+0200",
+      "updated": "2026-05-22T18:28:21.262+0200",
+      "body_text": "Hallo @Franziska Schmidt ,\nFax habe ich in der Mapping-Tabelle ergänzt:\nhttps://hagebau.atlassian.net/wiki/x/sAyXCQ\n\nGruß\nAusten\n"
+    },
+    {
+      "author": "Franziska Schmidt",
+      "created": "2026-05-28T15:42:37.703+0200",
+      "updated": "2026-05-28T15:42:37.703+0200",
+      "body_text": "Hallo Zusammen,\n\nAnpassung des Mappings auf dem Konverter läuft. Aktueller Stand kann hier eingesehen werden:\n\n[DIKONV-3178] Erweiterung Mapping Kreditoren Stammdatenhub --> Salesforce - Jira hagebau\n"
+    }
+  ],
+  "labels": [
+    "CONFIG",
+    "Plattform",
+    "Schnittstellen",
+    "ZVD"
+  ],
+  "sprint": "SMART Release 2 - Sprint 1"
+}

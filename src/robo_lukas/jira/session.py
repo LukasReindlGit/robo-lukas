@@ -16,6 +16,8 @@ import time
 from urllib.parse import urlparse
 from typing import TYPE_CHECKING
 
+from selenium.common.exceptions import InvalidSessionIdException, WebDriverException
+
 from robo_lukas.microsoft_sso import drain_microsoft_sso_interstitials, wait_document_ready
 from robo_lukas.jira.models import JiraConfig
 from robo_lukas.jira.safety import (
@@ -56,7 +58,13 @@ def wait_for_jira_login(
     stall_count = 0
 
     while time.monotonic() < deadline:
-        url = driver.current_url or ""
+        try:
+            url = driver.current_url or ""
+        except (InvalidSessionIdException, WebDriverException) as exc:
+            raise TimeoutError(
+                "Browser session ended while waiting for Jira login. "
+                "Keep the login window open and re-run the command."
+            ) from exc
 
         wait_document_ready(driver, timeout_s=12.0)
 

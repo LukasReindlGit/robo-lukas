@@ -43,6 +43,12 @@ robo-jira wait-login --jira-url https://your-org.atlassian.net
 
 With a persistent profile the browser may already be logged in and return immediately.
 
+If `robo-jira` is not on your PATH (common on Windows), use:
+
+```powershell
+py -3 -m robo_lukas.jira.cli wait-login --jira-url https://your-org.atlassian.net
+```
+
 ## CLI reference
 
 ```text
@@ -52,6 +58,7 @@ robo-jira list-mine             List open issues assigned to you (default: 25)
 robo-jira list-sprint           List issues in the current open sprint (yours)
 robo-jira show PROJ-123         Show a specific issue with description + comments
 robo-jira search "JQL"          Run a JQL query
+robo-jira export-tree PROJ-123  Export root issue + direct subtasks to JSON files
 ```
 
 ### Common flags (available on every subcommand)
@@ -79,9 +86,30 @@ robo-jira show ECOM-808 --format json
 # Search with JQL
 robo-jira search "project = ECOM AND status = 'In Progress' AND assignee = currentUser()"
 
+# Export one root issue + all direct subtasks to a folder
+robo-jira export-tree ECOM-808 --out-dir hagetest --format json
+
 # Switch to a different customer's Jira on the fly
 robo-jira list-mine --jira-url https://other-customer.atlassian.net --format json
 ```
+
+## Export issue trees
+
+Use `export-tree` when you need a local folder with one parent issue, all direct subtasks,
+and all comments for each item.
+
+```powershell
+# Parent + subtasks + comments → ./hagetest
+robo-jira export-tree PHHPC-103 --jira-url https://hagebau.atlassian.net --out-dir hagetest --format json
+```
+
+Output files:
+
+- `hagetest/PHHPC-103.json` (root issue)
+- `hagetest/<SUBTASK-KEY>.json` (one file per subtask)
+- `hagetest/manifest.json` (contains exported keys/files + metadata)
+
+Use `--no-comments` if you only want issue fields and descriptions.
 
 ## Switching between customers
 
@@ -132,6 +160,12 @@ All commands support `--format json` (default: `text`).  The JSON shape for an i
 | `HTTP 403` | Permission denied on that project | Use an account that has read access |
 | `No Chrome/Chromium found` | Chrome not in PATH | Install Chrome or set `CHROME_BINARY` |
 | `SessionNotCreatedException` | Profile lock or ChromeDriver version mismatch | See `modules/outlook/README.md` for debug steps |
+
+### Windows launcher / PATH troubleshooting
+
+- `robo-jira: command not found`: scripts directory is not on PATH. Use `py -3 -m robo_lukas.jira.cli ...` or add `Python\\Scripts` to PATH.
+- `python3` opens Microsoft Store / not found: this alias is often disabled on Windows; use `py -3` instead.
+- `ModuleNotFoundError: No module named 'requests'`: run `py -3 -m pip install -e .` from repo root.
 
 ## Read-only guarantee
 

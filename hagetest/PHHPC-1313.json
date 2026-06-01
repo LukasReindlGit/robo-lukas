@@ -1,0 +1,16 @@
+{
+  "key": "PHHPC-1313",
+  "summary": "Speicherfunktion für geänderte Lieferantenstammdaten",
+  "status": "Offen",
+  "issue_type": "Unteraufgabe",
+  "created": "2026-05-22T15:18:18.822+0200",
+  "updated": "2026-05-22T15:18:21.395+0200",
+  "url": "https://hagebau.atlassian.net/browse/PHHPC-1313",
+  "assignee": null,
+  "reporter": "Thomas Rehbein",
+  "priority": "Undefined",
+  "description_text": "Stelle sicher, dass Änderungen an Lieferantenstammdaten innerhalb einer Aktion gespeichert werden und nach dem Speichern sofort verfügbar sind. Berücksichtige dabei mögliche Konflikte mit externen Daten-Updates.\n",
+  "comments": [],
+  "labels": [],
+  "sprint": "SMART Release 2 - Sprint 1"
+}
