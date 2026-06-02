@@ -40,6 +40,45 @@ python -m robo_lukas.outlook list --folder inbox --limit 20 --format json
 
 Or use the console script: `robo-outlook list --folder sent --limit 10`.
 
+## MCP server (AI tool connection)
+
+You can expose the read-only robo modules as MCP tools for compatible AI clients.
+
+1. Install/update in editable mode:
+
+```bash
+pip install -e .
+```
+
+2. Start MCP server over stdio:
+
+```bash
+robo-mcp
+```
+
+3. Register it in your MCP client config (example):
+
+```json
+{
+  "mcpServers": {
+    "robo-lukas": {
+      "command": "robo-mcp",
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
+```
+
+Exposed tools currently include read-only wrappers for:
+- local git (`git_status`, `git_log`, `git_diff`, `git_summary`)
+- Jira (`jira_status`, `jira_list_mine`, `jira_show_issue`)
+- Microsoft To Do (`todo_lists`, `todo_list_tasks`, `todo_all_tasks`)
+- Outlook (`outlook_list_messages`)
+
+The tools reuse the same `.env` configuration already used by the CLI modules.
+
 ## Constraint: Microsoft 365
 
 Tenant policy blocks **Microsoft Graph** (or similar API access). Outlook and To Do integrations **must** use **browser automation** (e.g. Selenium or Playwright), persistent profiles, and tolerant selectors — see each module README and [ADR 0001](docs/adr/0001-microsoft-browser-automation.md).

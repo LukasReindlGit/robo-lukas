@@ -61,6 +61,10 @@ playwright-report/
 test-results/
 *.har
 
+# Jira export output (may contain customer ticket data — never commit)
+jira-export/
+*-export/
+
 # Logs
 *.log
 logs/

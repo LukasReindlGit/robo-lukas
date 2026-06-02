@@ -9,6 +9,7 @@ description = "Modular work automation toolkit (Outlook, Microsoft To Do, etc.)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "mcp",
     "selenium>=4.15.0",
     "python-dotenv>=1.0.0",
     "requests>=2.28.0",
@@ -24,6 +25,7 @@ robo-outlook = "robo_lukas.outlook.cli:main"
 robo-todo = "robo_lukas.ms_todo.cli:main"
 robo-jira = "robo_lukas.jira.cli:main"
 robo-git = "robo_lukas.git_local.cli:main"
+robo-mcp = "robo_lukas.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
